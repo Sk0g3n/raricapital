@@ -12,12 +12,12 @@ describe('DappDeployment and initialization', () => {
         //deploy fusefeedistributor and initalize admin
         deployer = await FuseAdminDeployer.new();
         await deployer.deployFuseAdmin();
-        fuseAdmin = await deployer.fuseadmin.call();
-        await deployer.initializeFeeDistributorAndAdmin(2);
+        fuseAdmin = await deployer.fuseadmin.call({from: EOAboss});
+        await deployer.initializeFeeDistributorAndAdmin(2, {from: EOAboss});
     })
 
     describe('Comptroller deployment', () => {
-        it('should deploye comptroller storage', async () => {
+        it('should deployer comptroller storage', async () => {
             console.log(fuseAdmin);
         })
     })
