@@ -3,6 +3,13 @@
  */
 require('@nomiclabs/hardhat-truffle5');
 module.exports = {
+  defaultNetwork: 'hardhat',
+  networks: {
+    hardhat: {
+      chainID: 1337,
+      allowUnlimitedContractSize: true,
+    },
+  },
   solidity: {
     compilers: [
       {
@@ -15,7 +22,7 @@ module.exports = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 200,
+        runs: 2000,
       },
     },
   },
