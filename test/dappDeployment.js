@@ -6,7 +6,7 @@ const Comptroller = artifacts.require('Comptroller');
 
 
 describe('DappDeployment and initialization', () => {
-    let fuseAdmin, deployer, accounts, EOAboss;
+    let fuseAdmin, deployer, accounts, EOAboss, unitroller;
 
     before(async() => {
         accounts = await web3.eth.getAccounts();
@@ -28,8 +28,18 @@ describe('DappDeployment and initialization', () => {
             comptroller = await Comptroller.new({from:EOAboss, gas:30000000, gasPrice:800000000});
         })
 
-        it('should set the implementation on the logic contract', async () => {
-            console.log(comptroller.address);
+        it('should add the implementation on the implementations whitelist', async () => {
+            //console.log(comptroller.address);
+            //set new implementation in comptrollerImplementationWhitelist in FuseFeeDistributor, from owner which is the deployer contract
+            await deployer.editComptrollerImplementationWhitelist(comptroller.address);
+            //call _setPendingImplementation on unitroller from admin EOABOSS
+            await unitroller._setPendingImplementation(comptroller.address, {from:EOAboss, gas:30000000, gasPrice:800000000});            
+            assert.equal(await unitroller.pendingComptrollerImplementation.call(), comptroller.address);
+        })
+
+        it('should accept new implementation', async () => {
+            await comptroller._become(unitroller.address, {from:EOAboss});
+            assert.equal(await unitroller.comptrollerImplementation.call(), comptroller.address);
         })
     })
 

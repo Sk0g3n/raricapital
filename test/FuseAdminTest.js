@@ -22,7 +22,7 @@ describe('FuseFeeDistributorDeployer', () => {
             //fuseadmin = await deployer.methods.deployFuseAdmin().send({from:Admin, gas: 5000000});
             await deployer.deployFuseAdmin();
             fuseadmin = await deployer.fuseadmin.call();
-            console.log(fuseadmin);
+            //console.log(fuseadmin);
         })  
         
         it('should call initialize on the deployed admin contract', async () => {
