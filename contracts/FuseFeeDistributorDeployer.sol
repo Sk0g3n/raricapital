@@ -31,4 +31,46 @@ contract FuseAdminDeployer {
 
         FuseFeeDistributor(fuseadmin)._editComptrollerImplementationWhitelist(oldImplement, newImplement, status);
     }
+
+    function encode(address _comptroller,
+                    address _interestRateModel,
+                    string memory _name,
+                    string memory _symbol,
+                    address _implementation,
+                    bytes memory _becomeImplementationData,
+                    uint256 _reserveFactorMantissa,
+                    uint256 _adminFeeMantissa ) public pure returns(bytes memory){
+        
+        return (abi.encode(_comptroller,
+                           _interestRateModel,
+                           _name,
+                           _symbol,
+                           _implementation,
+                           _becomeImplementationData,
+                           _reserveFactorMantissa,
+                           _adminFeeMantissa));
+    }
+
+    function decode(bytes memory data) public pure returns(address comptroller,
+                                                           address interestRateModel,
+                                                           string memory name,
+                                                           string memory symbol,
+                                                           address implementation,
+                                                           bytes memory becomeImplementationData,
+                                                           uint256 reserveFactorMantissa,
+                                                           uint256 adminFeeMantissa) {
+        (comptroller,
+        interestRateModel,
+        name,
+        symbol,
+        implementation,
+        becomeImplementationData,
+        reserveFactorMantissa,
+        adminFeeMantissa) = abi.decode(data, (address, address, string, string, address, bytes, uint256, uint256));                                                       
+
+    }
+
+    function initializeMarket() public {
+
+    }
 }

@@ -6,7 +6,7 @@ const Comptroller = artifacts.require('Comptroller');
 
 
 describe('DappDeployment and initialization', () => {
-    let fuseAdmin, deployer, accounts, EOAboss, unitroller;
+    let fuseAdmin, deployer, accounts, EOAboss, unitroller, calldata;
 
     before(async() => {
         accounts = await web3.eth.getAccounts();
@@ -40,6 +40,28 @@ describe('DappDeployment and initialization', () => {
         it('should accept new implementation', async () => {
             await comptroller._become(unitroller.address, {from:EOAboss});
             assert.equal(await unitroller.comptrollerImplementation.call(), comptroller.address);
+        })
+
+        it('should encode constructordata to pass as calldata to deployCether', async () => {
+            calldata = await deployer.encode(unitroller.address,
+                                '0x0000000000000000000000000000000000000000',
+                                'asshole',
+                                'ASS',
+                                '0x0000000000000000000000000000000000000000',
+                                '0x00',
+                                22,
+                                22);
+            
+            console.log(calldata);            
+        })
+
+        it('should decode constructordata', async () => {
+            decoded = await deployer.decode(calldata);
+            console.log(decoded);
+        })
+
+        xit('should deploy a new CEther token market', async () => {
+            await unitroller._deployMarket(true, )
         })
     })
 
