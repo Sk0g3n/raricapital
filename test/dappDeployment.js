@@ -3,10 +3,12 @@ const { web3, assert } = require("hardhat");
 const FuseAdminDeployer = artifacts.require('FuseAdminDeployer');
 const Unitroller = artifacts.require('Unitroller');
 const Comptroller = artifacts.require('Comptroller');
+const JumpRateModel = artifacts.require('JumpRateModel');
+const CEtherDelegate = artifacts.require('CEtherDelegate');
 
 
 describe('DappDeployment and initialization', () => {
-    let fuseAdmin, deployer, accounts, EOAboss, unitroller, calldata;
+    let fuseAdmin, deployer, accounts, EOAboss, unitroller, calldata, interestmodel, cetherdelegate;
 
     before(async() => {
         accounts = await web3.eth.getAccounts();
@@ -42,26 +44,37 @@ describe('DappDeployment and initialization', () => {
             assert.equal(await unitroller.comptrollerImplementation.call(), comptroller.address);
         })
 
+        it('should deploy the interest rate model and initialize it on comptroller', async () => {
+            interestmodel = await JumpRateModel.new(12, 2, 4, 81);
+            console.log(interestmodel.address);
+        })
+
+        it('should deploy CEtherDelegate logic/implementation of CEther', async () => {
+            cetherdelegate = await CEtherDelegate.new();
+            console.log(cetherdelegate.address);
+        })
+
         it('should encode constructordata to pass as calldata to deployCether', async () => {
             calldata = await deployer.encode(unitroller.address,
-                                '0x0000000000000000000000000000000000000000',
-                                'asshole',
-                                'ASS',
-                                '0x0000000000000000000000000000000000000000',
+                                interestmodel.address,
+                                'ScamToken',
+                                'SCT',
+                                cetherdelegate.address,
                                 '0x00',
-                                22,
-                                22);
+                                8,
+                                1);
             
-            console.log(calldata);            
+            //console.log(calldata);            
         })
 
         it('should decode constructordata', async () => {
             decoded = await deployer.decode(calldata);
-            console.log(decoded);
+            //console.log(decoded);
         })
 
-        xit('should deploy a new CEther token market', async () => {
-            await unitroller._deployMarket(true, )
+        it('should deploy a new CEther token market', async () => {
+            cether = await comptroller._deployMarket(true, calldata, 75, {from:EOAboss, gas:30000000, gasPrice:800000000});
+            console.log(cether);
         })
     })
 
