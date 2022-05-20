@@ -1,0 +1,21 @@
+account_id: 7bda6d7e-2b16-4377-9d9f-9ae149664f2d
+exports:
+  asshole:
+    chain_config:
+      berlin_block: 0
+      byzantium_block: 0
+      constantinople_block: 0
+      eip150_block: 0
+      eip150_hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
+      eip155_block: 0
+      eip158_block: 0
+      homestead_block: 0
+      istanbul_block: 0
+      london_block: 0
+      petersburg_block: 0
+    forked_network: Mainnet
+    project_slug: Sk0g3n/raricapital
+    protocol: ""
+    rpc_address: 127.0.0.1:8545
+project_slug: raricapital
+provider: ""

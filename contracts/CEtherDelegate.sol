@@ -52,8 +52,9 @@ contract CEtherDelegate is CDelegateInterface, CEther {
      */
     function _setImplementationInternal(address implementation_, bool allowResign, bytes memory becomeImplementationData) internal {
         // Check whitelist
+        console.log('succ');
         require(fuseAdmin.cEtherDelegateWhitelist(implementation, implementation_, allowResign), "!impl");
-
+        console.log('ciciic');
         // Call _resignImplementation internally (this delegate's code)
         if (allowResign) _resignImplementation();
 

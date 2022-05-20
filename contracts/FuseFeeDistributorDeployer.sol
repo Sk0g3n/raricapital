@@ -70,7 +70,16 @@ contract FuseAdminDeployer {
 
     }
 
-    function initializeMarket() public {
-
+    function editcEtherImplementationWhitelist(address newimplement) public {
+        address[] memory oldImplement = new address[](1);
+        address[] memory newImplement = new address[](1);
+        bool[] memory allowRes = new bool[](1);
+        bool[] memory status = new bool[](1);
+        oldImplement[0] = 0x0000000000000000000000000000000000000000;
+        newImplement[0] = newimplement;
+        allowRes[0] = false;
+        status[0] = true;
+        FuseFeeDistributor(fuseadmin)._editCEtherDelegateWhitelist(oldImplement, newImplement, allowRes, status);
     }
+
 }

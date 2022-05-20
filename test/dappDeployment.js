@@ -5,6 +5,7 @@ const Unitroller = artifacts.require('Unitroller');
 const Comptroller = artifacts.require('Comptroller');
 const JumpRateModel = artifacts.require('JumpRateModel');
 const CEtherDelegate = artifacts.require('CEtherDelegate');
+const FuseFeeDistributor = artifacts.require('FuseFeeDistributor');
 
 
 describe('DappDeployment and initialization', () => {
@@ -18,6 +19,7 @@ describe('DappDeployment and initialization', () => {
         await deployer.deployFuseAdmin();
         fuseAdmin = await deployer.fuseadmin.call({from: EOAboss});
         await deployer.initializeFeeDistributorAndAdmin(2, {from: EOAboss});
+        fusefeedistributor = await FuseFeeDistributor.at('0xa16E02E87b7454126E5E10d957A927A7F5B5d2be');
     })
 
     describe('Comptroller proxy/logic deployment and initalization', () => {
@@ -45,6 +47,11 @@ describe('DappDeployment and initialization', () => {
             assert.equal(await unitroller.comptrollerImplementation.call(), comptroller.address);
         })
 
+        it('should check if oldImplementation a', async () => {
+            comptrollerimplementation = await unitroller.comptrollerImplementation.call();
+            assert.equal(await fusefeedistributor.latestComptrollerImplementation(comptrollerimplementation), comptrollerimplementation);
+        })
+
         it('should deploy the interest rate model and initialize it on comptroller', async () => {
             interestmodel = await JumpRateModel.new(12, 2, 4, 81);
             console.log(interestmodel.address);
@@ -62,7 +69,7 @@ describe('DappDeployment and initialization', () => {
                                 'SCT',
                                 cetherdelegate.address,
                                 '0x00',
-                                8,
+                                1,
                                 1);
             
             //console.log(calldata);            
@@ -73,9 +80,17 @@ describe('DappDeployment and initialization', () => {
             //console.log(decoded);
         })
 
+        it('should add the cetherdelegate/logic to cether implementation whitelist on fuseadmin', async () => {
+            await deployer.editcEtherImplementationWhitelist(cetherdelegate.address);
+            console.log(await fusefeedistributor.cEtherDelegateWhitelist('0x0000000000000000000000000000000000000000',cetherdelegate.address,true));
+        })
+
         it('should deploy a new CEther token market', async () => {
-            await cunitroller._deployMarket(true, calldata, 75, {from:EOAboss, gas:30000000, gasPrice:800000000});
-            console.log(cunitroller);
+            //console.log(cunitroller.address);
+
+            await cunitroller._deployMarket(true, calldata, 1, {from:EOAboss, gas:30000000, gasPrice:800000000});
+            console.log(await fusefeedistributor.proxyAdd.call());
+            onsole.log(cunitroller);
         })
     })
 

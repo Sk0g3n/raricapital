@@ -131,7 +131,6 @@ contract FuseFeeDistributor is Initializable, OwnableUpgradeable {
                 revert(0, "Failed to deploy CEther.")
             }
         }
-
         return proxy;
     }
 

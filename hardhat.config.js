@@ -2,8 +2,14 @@
  * @type import('hardhat/config').HardhatUserConfig
  */
 require('@nomiclabs/hardhat-truffle5');
+require('@tenderly/hardhat-tenderly');
+
 module.exports = {
   defaultNetwork: 'hardhat',
+  tenderly: {
+    project: "raricapital",
+    username: "Sk0g3n",
+  },
   networks: {
     hardhat: {
       chainID: 1337,
