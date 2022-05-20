@@ -8,7 +8,7 @@ const CEtherDelegate = artifacts.require('CEtherDelegate');
 
 
 describe('DappDeployment and initialization', () => {
-    let fuseAdmin, deployer, accounts, EOAboss, unitroller, calldata, interestmodel, cetherdelegate;
+    let fuseAdmin, deployer, accounts, cunitroller, EOAboss, unitroller, calldata, interestmodel, cetherdelegate;
 
     before(async() => {
         accounts = await web3.eth.getAccounts();
@@ -23,6 +23,7 @@ describe('DappDeployment and initialization', () => {
     describe('Comptroller proxy/logic deployment and initalization', () => {
         it('should deployer comptroller proxy/storage', async () => {
             unitroller = await Unitroller.new({from:EOAboss});
+            cunitroller = await Comptroller.at(unitroller.address);
             assert.equal(await unitroller.admin.call(), accounts[1]);
         })
 
@@ -73,8 +74,8 @@ describe('DappDeployment and initialization', () => {
         })
 
         it('should deploy a new CEther token market', async () => {
-            cether = await comptroller._deployMarket(true, calldata, 75, {from:EOAboss, gas:30000000, gasPrice:800000000});
-            console.log(cether);
+            await cunitroller._deployMarket(true, calldata, 75, {from:EOAboss, gas:30000000, gasPrice:800000000});
+            console.log(cunitroller);
         })
     })
 
