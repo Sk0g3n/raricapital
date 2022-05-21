@@ -86,11 +86,14 @@ describe('DappDeployment and initialization', () => {
         })
 
         it('should deploy a new CEther token market', async () => {
-            //console.log(cunitroller.address);
+            console.log(cunitroller.address);
+            console.log(EOAboss);
 
-            await cunitroller._deployMarket(true, calldata, 1, {from:EOAboss, gas:30000000, gasPrice:800000000});
-            console.log(await fusefeedistributor.proxyAdd.call());
-            onsole.log(cunitroller);
+            await cunitroller._deployMarket(true, calldata, 70, {from:EOAboss, gas:30000000, gasPrice:800000000});
+        })
+
+        it('shoudl return newimplemenation address', async () => {
+            
         })
     })
 

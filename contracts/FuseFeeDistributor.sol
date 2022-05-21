@@ -6,6 +6,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/SafeERC20Upgradeable.sol";
+import 'hardhat/console.sol';
 
 /**
  * @title FuseFeeDistributor
@@ -131,6 +132,7 @@ contract FuseFeeDistributor is Initializable, OwnableUpgradeable {
                 revert(0, "Failed to deploy CEther.")
             }
         }
+        console.log('deployed Cetherdelegator address is', proxy);
         return proxy;
     }
 

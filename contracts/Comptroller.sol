@@ -1083,7 +1083,7 @@ contract Comptroller is ComptrollerV3Storage, ComptrollerInterface, ComptrollerE
         if (!hasAdminRights()) {
             return fail(Error.UNAUTHORIZED, FailureInfo.SET_COLLATERAL_FACTOR_OWNER_CHECK);
         }
-
+        console.log('_setCollateralFactor after admin check and cether address is %s',address(cToken) );
         // Verify market is listed
         Market storage market = markets[address(cToken)];
         if (!market.isListed) {
@@ -1215,8 +1215,9 @@ contract Comptroller is ComptrollerV3Storage, ComptrollerInterface, ComptrollerE
 
         // Support market here in the Comptroller
         uint256 err = _supportMarket(cToken);
-
+        console.log('after supportMarket');
         // Set collateral factor
+        //return uint(2);
         return err == uint(Error.NO_ERROR) ? _setCollateralFactor(cToken, collateralFactorMantissa) : err;
     }
 

@@ -20,7 +20,7 @@ contract CEtherDelegate is CDelegateInterface, CEther {
     function _becomeImplementation(bytes calldata data) external {
         // Shh -- currently unused
         data;
-
+        console.log('_becomeImplementation');
         // Shh -- we don't ever want this hook to be marked pure
         if (false) {
             implementation = address(0);
@@ -52,21 +52,26 @@ contract CEtherDelegate is CDelegateInterface, CEther {
      */
     function _setImplementationInternal(address implementation_, bool allowResign, bytes memory becomeImplementationData) internal {
         // Check whitelist
-        console.log('succ');
+        console.log('Whitelist check %s',fuseAdmin.cEtherDelegateWhitelist(implementation, implementation_, allowResign));
         require(fuseAdmin.cEtherDelegateWhitelist(implementation, implementation_, allowResign), "!impl");
-        console.log('ciciic');
+        
         // Call _resignImplementation internally (this delegate's code)
-        if (allowResign) _resignImplementation();
+        if (allowResign) {
+            console.log('if cycle allowResign');
+            _resignImplementation();
+        }
 
+        
         // Get old implementation
         address oldImplementation = implementation;
-
+        
         // Store new implementation
         implementation = implementation_;
-
+        console.log('old implementation %s', oldImplementation);
+        console.log('new implementation address %s',implementation);
         // Call _becomeImplementation externally (delegating to new delegate's code)
-        _functionCall(address(this), abi.encodeWithSignature("_becomeImplementation(bytes)", becomeImplementationData), "!become");
-
+        //_functionCall(address(this), abi.encodeWithSignature("_becomeImplementation(bytes)", becomeImplementationData), "!become");
+        console.log('after _functionCall');
         // Emit event
         emit NewImplementation(oldImplementation, implementation);
     }
