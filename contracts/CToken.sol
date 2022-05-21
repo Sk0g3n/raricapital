@@ -576,7 +576,6 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
 
         /* We call the defense hook */
         comptroller.mintVerify(address(this), minter, vars.actualMintAmount, vars.mintTokens);
-
         return (uint(Error.NO_ERROR), vars.actualMintAmount);
     }
 
@@ -1594,13 +1593,11 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      */
     function _functionCall(address target, bytes memory data, string memory errorMessage) internal returns (bytes memory) {
         (bool success, bytes memory returndata) = target.call(data);
-        console.log('_functionCallresult %s',success);
 
         if (!success) {
             // Look for revert reason and bubble it up if present
             if (returndata.length > 0) {
                 // The easiest way to bubble the revert reason is using memory via assembly
-                console.log('if cycle in _functionCall');
                 // solhint-disable-next-line no-inline-assembly
                 assembly {
                     let returndata_size := mload(returndata)

@@ -82,4 +82,9 @@ contract FuseAdminDeployer {
         FuseFeeDistributor(fuseadmin)._editCEtherDelegateWhitelist(oldImplement, newImplement, allowRes, status);
     }
 
+   /* function setPriceOracle(address _comptrolleraddress, address _priceoracle) public {
+        bytes memory data = abi.encodeWithSignature('_setPriceOracle(PriceOracle)', _priceoracle);
+        _comptrolleraddress.delegatecall(data);
+    }
+    */
 }

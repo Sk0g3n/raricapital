@@ -1021,16 +1021,16 @@ contract Comptroller is ComptrollerV3Storage, ComptrollerInterface, ComptrollerE
       */
     function _setPriceOracle(PriceOracle newOracle) public returns (uint) {
         // Check caller is admin
+        
         if (!hasAdminRights()) {
             return fail(Error.UNAUTHORIZED, FailureInfo.SET_PRICE_ORACLE_OWNER_CHECK);
         }
-
+        
         // Track the old oracle for the comptroller
         PriceOracle oldOracle = oracle;
 
         // Set comptroller's oracle to newOracle
         oracle = newOracle;
-        console.log('new oracle is %s', address(oracle));
         // Emit NewPriceOracle(oldOracle, newOracle)
         emit NewPriceOracle(oldOracle, newOracle);
 
@@ -1083,31 +1083,28 @@ contract Comptroller is ComptrollerV3Storage, ComptrollerInterface, ComptrollerE
         if (!hasAdminRights()) {
             return fail(Error.UNAUTHORIZED, FailureInfo.SET_COLLATERAL_FACTOR_OWNER_CHECK);
         }
-        console.log('_setCollateralFactor after admin check and cether address is %s',address(cToken) );
         // Verify market is listed
         Market storage market = markets[address(cToken)];
         if (!market.isListed) {
             return fail(Error.MARKET_NOT_LISTED, FailureInfo.SET_COLLATERAL_FACTOR_NO_EXISTS);
         }
-        console.log('1');
+
         Exp memory newCollateralFactorExp = Exp({mantissa: newCollateralFactorMantissa});
 
-        console.log('2');
         // Check collateral factor <= 0.9
         Exp memory highLimit = Exp({mantissa: collateralFactorMaxMantissa});
         if (lessThanExp(highLimit, newCollateralFactorExp)) {
             return fail(Error.INVALID_COLLATERAL_FACTOR, FailureInfo.SET_COLLATERAL_FACTOR_VALIDATION);
         }
-        console.log('3');
+    
         // If collateral factor != 0, fail if price == 0
         if (newCollateralFactorMantissa != 0 && oracle.getUnderlyingPrice(cToken) == 0) {
             return fail(Error.PRICE_ERROR, FailureInfo.SET_COLLATERAL_FACTOR_WITHOUT_PRICE);
         }
-        console.log('4');
         // Set market's collateral factor to new collateral factor, remember old value
         uint oldCollateralFactorMantissa = market.collateralFactorMantissa;
         market.collateralFactorMantissa = newCollateralFactorMantissa;
-        console.log('end of _setcollateralfactor execution');
+   
         // Emit event with asset, old collateral factor, and new collateral factor
         emit NewCollateralFactor(cToken, oldCollateralFactorMantissa, newCollateralFactorMantissa);
 
@@ -1216,7 +1213,6 @@ contract Comptroller is ComptrollerV3Storage, ComptrollerInterface, ComptrollerE
 
         // Support market here in the Comptroller
         uint256 err = _supportMarket(cToken);
-        console.log('after supportMarket');
         // Set collateral factor
         //return uint(2);
         return err == uint(Error.NO_ERROR) ? _setCollateralFactor(cToken, collateralFactorMantissa) : err;

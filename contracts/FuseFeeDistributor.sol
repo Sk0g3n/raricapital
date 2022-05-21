@@ -132,7 +132,6 @@ contract FuseFeeDistributor is Initializable, OwnableUpgradeable {
                 revert(0, "Failed to deploy CEther.")
             }
         }
-        console.log('deployed Cetherdelegator address is', proxy);
         return proxy;
     }
 

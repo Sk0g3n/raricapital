@@ -7,9 +7,10 @@ const JumpRateModel = artifacts.require('JumpRateModel');
 const CEtherDelegate = artifacts.require('CEtherDelegate');
 const FuseFeeDistributor = artifacts.require('FuseFeeDistributor');
 const SimplePriceOracle = artifacts.require('SimplePriceOracle');
+const Hack = artifacts.require('Hack');
 
 describe('DappDeployment and initialization', () => {
-    let fuseAdmin, deployer, accounts, cunitroller, EOAboss, unitroller, calldata, interestmodel, priceoracle, cetherdelegate;
+    let fuseAdmin, deployer, accounts, cunitroller, EOAboss, unitroller, calldata, interestmodel, priceoracle, cetherdelegate, cether;
 
     before(async() => {
         accounts = await web3.eth.getAccounts();
@@ -82,25 +83,46 @@ describe('DappDeployment and initialization', () => {
 
         it('should add the cetherdelegate/logic to cether implementation whitelist on fuseadmin', async () => {
             await deployer.editcEtherImplementationWhitelist(cetherdelegate.address);
-            console.log(await fusefeedistributor.cEtherDelegateWhitelist('0x0000000000000000000000000000000000000000',cetherdelegate.address,true));
+            //console.log(await fusefeedistributor.cEtherDelegateWhitelist('0x0000000000000000000000000000000000000000',cetherdelegate.address,true));
         })
 
         it('should deploy priceoracle and set it on comptroller', async () => {
             priceoracle = await SimplePriceOracle.new();
-            await cunitroller._setPriceOracle(priceoracle);
-            assert.equal(cunitroller.oracle.call(), priceoracle);
+            await cunitroller._setPriceOracle(priceoracle.address, {from:EOAboss});
+            //await deployer.setPriceOracle(cunitroller.address, priceoracle.address, {from:EOAboss});
+            assert.equal(await cunitroller.oracle.call(), priceoracle.address);
         })
 
         it('should deploy a new CEther token market', async () => {
-            console.log(cunitroller.address);
-            console.log(EOAboss);
-
             await cunitroller._deployMarket(true, calldata, 70, {from:EOAboss, gas:30000000, gasPrice:800000000});
+            cether = '0x26296dd4affd47bdfbfcd5acfb29bb731f0ca12d';
         })
 
-        it('shoudl return newimplemenation address', async () => {
-            
+        it('should return CETH underlying price', async () => {
+            await priceoracle.getUnderlyingPrice(cether);
         })
+
+        describe('Entering Markets and minting CEther', () => {
+            let hack;
+            it('should deploy malicious contract adn send it some eth', async () => {
+                hack = await Hack.new(comptroller.address, cether);
+                await hack.send(web3.utils.toWei('20', "ether"), {from:accounts[2]});
+                assert.equal(await web3.eth.getBalance(hack.address), web3.utils.toWei('20', 'ether'));
+            })
+
+            it('should let the attacker enter a market', async () => {
+                await hack.enterMarket();
+            })
+
+            it('should mint cether for eth', async () => {
+                await hack.callMint(cether);
+                cetherdelegator = await CEtherDelegate.at(cether);
+                //console.log(await cetherdelegator.balanceOf(hack.address));
+                console.log(await hack.getCEthBalance.call());
+            })
+
+        })
+
     })
 
     
