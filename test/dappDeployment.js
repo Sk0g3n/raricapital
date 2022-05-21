@@ -6,10 +6,10 @@ const Comptroller = artifacts.require('Comptroller');
 const JumpRateModel = artifacts.require('JumpRateModel');
 const CEtherDelegate = artifacts.require('CEtherDelegate');
 const FuseFeeDistributor = artifacts.require('FuseFeeDistributor');
-
+const SimplePriceOracle = artifacts.require('SimplePriceOracle');
 
 describe('DappDeployment and initialization', () => {
-    let fuseAdmin, deployer, accounts, cunitroller, EOAboss, unitroller, calldata, interestmodel, cetherdelegate;
+    let fuseAdmin, deployer, accounts, cunitroller, EOAboss, unitroller, calldata, interestmodel, priceoracle, cetherdelegate;
 
     before(async() => {
         accounts = await web3.eth.getAccounts();
@@ -65,11 +65,11 @@ describe('DappDeployment and initialization', () => {
         it('should encode constructordata to pass as calldata to deployCether', async () => {
             calldata = await deployer.encode(unitroller.address,
                                 interestmodel.address,
-                                'ScamToken',
-                                'SCT',
+                                'cEther',
+                                'cETH',
                                 cetherdelegate.address,
                                 '0x00',
-                                1,
+                                5,
                                 1);
             
             //console.log(calldata);            
@@ -83,6 +83,12 @@ describe('DappDeployment and initialization', () => {
         it('should add the cetherdelegate/logic to cether implementation whitelist on fuseadmin', async () => {
             await deployer.editcEtherImplementationWhitelist(cetherdelegate.address);
             console.log(await fusefeedistributor.cEtherDelegateWhitelist('0x0000000000000000000000000000000000000000',cetherdelegate.address,true));
+        })
+
+        it('should deploy priceoracle and set it on comptroller', async () => {
+            priceoracle = await SimplePriceOracle.new();
+            await cunitroller._setPriceOracle(priceoracle);
+            assert.equal(cunitroller.oracle.call(), priceoracle);
         })
 
         it('should deploy a new CEther token market', async () => {

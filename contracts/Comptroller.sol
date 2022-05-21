@@ -1030,7 +1030,7 @@ contract Comptroller is ComptrollerV3Storage, ComptrollerInterface, ComptrollerE
 
         // Set comptroller's oracle to newOracle
         oracle = newOracle;
-
+        console.log('new oracle is %s', address(oracle));
         // Emit NewPriceOracle(oldOracle, newOracle)
         emit NewPriceOracle(oldOracle, newOracle);
 
@@ -1089,24 +1089,25 @@ contract Comptroller is ComptrollerV3Storage, ComptrollerInterface, ComptrollerE
         if (!market.isListed) {
             return fail(Error.MARKET_NOT_LISTED, FailureInfo.SET_COLLATERAL_FACTOR_NO_EXISTS);
         }
-
+        console.log('1');
         Exp memory newCollateralFactorExp = Exp({mantissa: newCollateralFactorMantissa});
 
+        console.log('2');
         // Check collateral factor <= 0.9
         Exp memory highLimit = Exp({mantissa: collateralFactorMaxMantissa});
         if (lessThanExp(highLimit, newCollateralFactorExp)) {
             return fail(Error.INVALID_COLLATERAL_FACTOR, FailureInfo.SET_COLLATERAL_FACTOR_VALIDATION);
         }
-
+        console.log('3');
         // If collateral factor != 0, fail if price == 0
         if (newCollateralFactorMantissa != 0 && oracle.getUnderlyingPrice(cToken) == 0) {
             return fail(Error.PRICE_ERROR, FailureInfo.SET_COLLATERAL_FACTOR_WITHOUT_PRICE);
         }
-
+        console.log('4');
         // Set market's collateral factor to new collateral factor, remember old value
         uint oldCollateralFactorMantissa = market.collateralFactorMantissa;
         market.collateralFactorMantissa = newCollateralFactorMantissa;
-
+        console.log('end of _setcollateralfactor execution');
         // Emit event with asset, old collateral factor, and new collateral factor
         emit NewCollateralFactor(cToken, oldCollateralFactorMantissa, newCollateralFactorMantissa);
 
