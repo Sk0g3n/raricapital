@@ -731,12 +731,14 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
       * @return uint 0=success, otherwise a failure (see ErrorReporter.sol for details)
       */
     function borrowInternal(uint borrowAmount) internal nonReentrant(false) returns (uint) {
+        console.log('borrowinternal start');
         uint error = accrueInterest();
         if (error != uint(Error.NO_ERROR)) {
             // accrueInterest emits logs on errors, but we still want to log the fact that an attempted borrow failed
             return fail(Error(error), FailureInfo.BORROW_ACCRUE_INTEREST_FAILED);
         }
         // borrowFresh emits borrow-specific logs on errors, so we don't need to
+        console.log('borrowinterlan end');
         return borrowFresh(msg.sender, borrowAmount);
     }
 
@@ -754,6 +756,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
       */
     function borrowFresh(address payable borrower, uint borrowAmount) internal returns (uint) {
         /* Fail if borrow not allowed */
+        console.log('borrowfresh start');
         uint allowed = comptroller.borrowAllowed(address(this), borrower, borrowAmount);
         if (allowed != 0) {
             return failOpaque(Error.COMPTROLLER_REJECTION, FailureInfo.BORROW_COMPTROLLER_REJECTION, allowed);
@@ -809,6 +812,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
          *  On success, the cToken borrowAmount less of cash.
          *  doTransferOut reverts if anything goes wrong, since we can't be sure if side effects occurred.
          */
+        console.log('borrowfress do transferout');
         doTransferOut(borrower, borrowAmount);
 
         /* We write the previously calculated values into storage */
@@ -822,7 +826,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
         /* We call the defense hook */
         // unused function
         // comptroller.borrowVerify(address(this), borrower, borrowAmount);
-
+        console.log('borrow fresh end');
         return uint(Error.NO_ERROR);
     }
 

