@@ -8,6 +8,7 @@ const CEtherDelegate = artifacts.require('CEtherDelegate');
 const FuseFeeDistributor = artifacts.require('FuseFeeDistributor');
 const SimplePriceOracle = artifacts.require('SimplePriceOracle');
 const Hack = artifacts.require('Hack');
+const CEther = artifacts.require('CEther');
 const BigNumber = require('bn.js');
 
 describe('DappDeployment and initialization', () => {
@@ -95,12 +96,21 @@ describe('DappDeployment and initialization', () => {
         })
 
         it('should deploy a new CEther token market', async () => {
-            await cunitroller._deployMarket(true, calldata, 70, {from:EOAboss, gas:30000000, gasPrice:800000000});
+            await cunitroller._deployMarket(true, calldata, 8, {from:EOAboss, gas:30000000, gasPrice:800000000});
             cether = '0x26296dd4affd47bdfbfcd5acfb29bb731f0ca12d';
+            console.log('getallmarkets %s', await cunitroller.getAllMarkets.call());
+            console.log('porco dio', await cunitroller.allMarkets(0));
         })
 
         it('should return CETH underlying price', async () => {
             console.log('hacker underlying is : %s',web3.utils.fromWei(await priceoracle.getUnderlyingPrice(cether), 'ether'));
+            
+        })
+
+        it( 'should return collateralFactorMantissa of the market', async () => {
+            console.log(await cunitroller.markets(cether));
+            //console.log(await cunitroller.allMarkets(cetherdelegate.address));
+            
         })
 
         describe('Entering Markets and minting CEther', () => {
@@ -113,11 +123,13 @@ describe('DappDeployment and initialization', () => {
 
             it('should let the attacker enter a market', async () => {
                 await hack.enterMarket();
+                await hack.checkAllMarkets;
+    
             })
 
             it('should mint cether for eth', async () => {
                 await hack.callMint();
-                cetherdelegator = await CEtherDelegate.at(cether);
+                cetherdelegator = await CEther.at(cether);
                 //console.log(await cetherdelegator.balanceOf(hack.address));
                 //console.log(await hack.getCEthBalance.call());
                 x = parseInt(await hack.getCEthBalance.call());
@@ -130,6 +142,7 @@ describe('DappDeployment and initialization', () => {
                 await hack.callBorrow();
                 console.log('hacker eth balance after borrow is: %s', await web3.eth.getBalance(hack.address));
                 console.log('hacker CEth contract balance after borrow is %s', web3.utils.fromWei(await hack.getCEthBalance.call(), "ether"));
+                //console.log('get balance of underlying', await cetherdelegator.balanceOfUnderlying(hack.address));
 
             })
 

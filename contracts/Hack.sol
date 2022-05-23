@@ -3,6 +3,7 @@ pragma solidity ^0.5.16;
 
 import './CEther.sol';
 import './Comptroller.sol';
+import 'hardhat/console.sol';
 
 contract Hack {
     address comptroller;
@@ -31,7 +32,11 @@ contract Hack {
     }
 
     function callBorrow() public {
-        CEther(_cether).borrow(20 ether);
+        CEther(_cether).borrow(1 ether);
+    }
+
+    function checkAllMarkets() public returns(address){
+
     }   
 
     function() external payable{}
