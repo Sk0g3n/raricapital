@@ -14,6 +14,8 @@ describe('FuseFeeDistributorDeployer', () => {
     describe('Testing FuseFeeDistributor deployment and initialization', () => {
         it('should deploy FuseAdminDeployer', async() => {
             deployer = await FuseAdminDeployer.new();
+            
+            
             //deployer = await new web3.eth.Contract(FuseAdminDeployer.abi).deploy({data:FuseAdminDeployer.bytecode}).send({from: Admin, gas:30000000, gasPrice:1000000000});
             //console.log(deployer.address);
         })

